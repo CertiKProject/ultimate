@@ -66,6 +66,11 @@ public class TraceCheckReasonUnknown {
 		UNSUPPORTED_NON_LINEAR_ARITHMETIC,
 
 		/**
+		 * Formulas in trace contain bit vector terms, but solver does not support bit vectors.
+		 */
+		UNSUPPORTED_BITVECTOR_THEORY,
+		
+		/**
 		 * Formulas in trace use const-arrays that are connected by a write chain
 		 */
 		UNSUPPORTED_CONST_ARRAY_WRITE_CHAINS,
@@ -162,6 +167,7 @@ public class TraceCheckReasonUnknown {
 	}
 
 	private static final String SMTINTERPOL_NONLINEAR_ARITHMETIC_MESSAGE = "Unsupported non-linear arithmetic";
+	private static final String SMTINTERPOL_BITVECTOR_MESSAGE = "Unsupported internal sort";
 	private static final String CVC4_NONLINEAR_ARITHMETIC_MESSAGE_PREFIX = "A non-linear fact";
 	private static final String CVC4_CONST_ARRAY_WRITE_CHAIN_CONNECTION_MESSAGE =
 			"Array theory solver does not yet support write-chains connecting two different constant arrays";
@@ -201,7 +207,12 @@ public class TraceCheckReasonUnknown {
 			// SMTInterpol does not support non-linear arithmetic
 			reason = Reason.UNSUPPORTED_NON_LINEAR_ARITHMETIC;
 			exceptionCategory = ExceptionHandlingCategory.KNOWN_IGNORE;
-		} else if (message.equals(CVC4_CONST_ARRAY_WRITE_CHAIN_CONNECTION_MESSAGE)) {
+		} else if (message.startsWith(SMTINTERPOL_BITVECTOR_MESSAGE)) {
+			// SMTInterpol does not support bit vectors
+		    reason = Reason.UNSUPPORTED_BITVECTOR_THEORY;
+		    exceptionCategory = ExceptionHandlingCategory.KNOWN_IGNORE;
+	    } 
+		else if (message.equals(CVC4_CONST_ARRAY_WRITE_CHAIN_CONNECTION_MESSAGE)) {
 			// CVC4 crashes because two const-arrays are connected in a write chain
 			reason = Reason.UNSUPPORTED_CONST_ARRAY_WRITE_CHAINS;
 			exceptionCategory = ExceptionHandlingCategory.KNOWN_IGNORE;
